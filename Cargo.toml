@@ -1,11 +1,12 @@
 [package]
-name = "pallet-multi-account"
+name = "substrate-pallet-multi-account"
+description = "A pallet/runtime module for Substrate with multisig functionality with a static `AccountId` and a dynamic `threshold` and set of `signatories`."
 version = "2.0.0-alpha.1"
 authors = ["Philip Stanislaus <6912756+philipstanislaus@users.noreply.github.com>"]
 edition = "2018"
 license = "LGPL-3.0"
 homepage = "https://centrifuge.io/"
-repository = "https://github.com/centrifuge/substrate-multi-account-pallet/"
+repository = "https://github.com/centrifuge/substrate-pallet-multi-account/"
 
 [dependencies]
 serde = { version = "1.0.101", optional = true }
