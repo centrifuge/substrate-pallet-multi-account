@@ -39,13 +39,13 @@
 //! signatories as in the utility pallet has certain downsides:
 //!
 //!  1. When using multisigs for token holdings and changing signatories or the threshold, the tokens need to be
-//! 	transferred to a new account ID, which might be a taxable event, depending on jurisdiction. Even if it's not, it
-//! 	complicates communication with accountants/tax advisors.
+//!     transferred to a new account ID, which might be a taxable event, depending on jurisdiction. Even if it's not, it
+//!     complicates communication with accountants/tax advisors.
 //!  2. When using multisigs for staking and changing signatories or the threshold, the account needs to unbond,
-//! 	transfer tokens and re-stake again. That can lead to months of lost staking rewards, depending on the unbonding
-//! 	time.
+//!     transfer tokens and re-stake again. That can lead to months of lost staking rewards, depending on the unbonding
+//!     time.
 //!  3. When using multisigs for voting and changing signatories or the threshold, the accounts needs to unvotes,
-//! 	transfer tokens and vote again, which is cumbersome.
+//!     transfer tokens and vote again, which is cumbersome.
 //!
 //! The downside of using this multi account module is that it is slightly more complex than the utility multisigs and
 //! that it introduces additional state and the requirement of creating multi accounts before using multisigs.
@@ -378,7 +378,7 @@ decl_module! {
             let who = ensure_signed(origin)?;
             ensure!(threshold >= 1, Error::<T>::ZeroThreshold);
             let max_sigs = T::MaxSignatories::get() as usize;
-            ensure!(signatories.len() >= 1, Error::<T>::TooFewSignatories);
+            ensure!(!signatories.is_empty(), Error::<T>::TooFewSignatories);
             ensure!(threshold as usize <= signatories.len(), Error::<T>::TooFewSignatories);
             ensure!(signatories.len() <= max_sigs, Error::<T>::TooManySignatories);
             ensure!(Self::is_sorted_and_unique(&signatories), Error::<T>::SignatoriesOutOfOrder);
@@ -500,7 +500,7 @@ decl_module! {
             let multi_account = <MultiAccounts<T>>::get(&multi_account_id).ok_or(Error::<T>::MultiAccountNotFound)?;
 
             // ensure that the origin is a signatory of the multi account
-            if let Err(_) = multi_account.signatories.binary_search(&who) {
+            if multi_account.signatories.binary_search(&who).is_err() {
                 Err(Error::<T>::NotSignatory)?
             }
 
@@ -518,10 +518,8 @@ decl_module! {
                         Self::deposit_event(RawEvent::MultisigApproval(who, timepoint, multi_account_id));
                         return Ok(())
                     }
-                } else {
-                    if (m.approvals.len() as u16) < multi_account.threshold {
-                        Err(Error::<T>::AlreadyApproved)?
-                    }
+                } else if (m.approvals.len() as u16) < multi_account.threshold {
+                    Err(Error::<T>::AlreadyApproved)?
                 }
 
                 let result = call.dispatch(frame_system::RawOrigin::Signed(multi_account_id.clone()).into());
@@ -589,7 +587,7 @@ decl_module! {
             let multi_account = <MultiAccounts<T>>::get(&multi_account_id).ok_or(Error::<T>::MultiAccountNotFound)?;
 
             // ensure that the origin is a signatory of the multi account
-            if let Err(_) = multi_account.signatories.binary_search(&who) {
+            if multi_account.signatories.binary_search(&who).is_err() {
                 Err(Error::<T>::NotSignatory)?
             }
 
@@ -605,22 +603,20 @@ decl_module! {
                 } else {
                     Err(Error::<T>::AlreadyApproved)?
                 }
+            } else if multi_account.threshold > 1 {
+                ensure!(maybe_timepoint.is_none(), Error::<T>::UnexpectedTimepoint);
+                let deposit = T::MultisigDepositBase::get()
+                    + T::MultisigDepositFactor::get() * multi_account.threshold.into();
+                T::Currency::reserve(&who, deposit)?;
+                <Multisigs<T>>::insert(&multi_account_id, call_hash, Multisig {
+                    when: Self::timepoint(),
+                    deposit,
+                    depositor: who.clone(),
+                    approvals: vec![who.clone()],
+                });
+                Self::deposit_event(RawEvent::NewMultisig(who, multi_account_id));
             } else {
-                if multi_account.threshold > 1 {
-                    ensure!(maybe_timepoint.is_none(), Error::<T>::UnexpectedTimepoint);
-                    let deposit = T::MultisigDepositBase::get()
-                        + T::MultisigDepositFactor::get() * multi_account.threshold.into();
-                    T::Currency::reserve(&who, deposit)?;
-                    <Multisigs<T>>::insert(&multi_account_id, call_hash, Multisig {
-                        when: Self::timepoint(),
-                        deposit,
-                        depositor: who.clone(),
-                        approvals: vec![who.clone()],
-                    });
-                    Self::deposit_event(RawEvent::NewMultisig(who, multi_account_id));
-                } else {
-                    Err(Error::<T>::NoApprovalsNeeded)?
-                }
+                Err(Error::<T>::NoApprovalsNeeded)?
             }
 
             Ok(())

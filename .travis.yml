@@ -1,0 +1,19 @@
+language: rust
+
+before_cache:
+  # Travis can't cache files that are not readable by "others"
+  - chmod -R a+r $HOME/.cargo
+
+cache: cargo
+
+branches:
+  only:
+  - master
+
+before_script:
+- rustup component add rustfmt
+
+script:
+- cargo build
+- cargo test
+- cargo fmt -- --check
