@@ -1,5 +1,8 @@
 # Substrate Multi Account Pallet
 
+[![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
+[![Build Status](https://travis-ci.com/centrifuge/substrate-multi-account-pallet.svg?branch=master)](https://travis-ci.com/centrifuge/substrate-multi-account-pallet)
+
 A pallet/runtime module for [Substrate](https://github.com/paritytech/substrate) with multisig functionality with a static `AccountId` and a dynamic `threshold` and set of `signatories`.
 
 ## Overview
