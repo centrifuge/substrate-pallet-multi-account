@@ -23,6 +23,18 @@ signatories as in the utility pallet has certain downsides:
 
 The downside of using this multi account module is that it is slightly more complex than the utility multisigs and that it introduces additional state and the requirement of creating multi accounts before using multisigs.
 
+## Example
+
+Alice creates a multisig operation:
+![Alice creates a multisig operation](https://raw.githubusercontent.com/centrifuge/substrate-pallet-multi-account/master/example/1-alice-calls.png)
+
+Bob approves it:
+![Bob approves it](https://raw.githubusercontent.com/centrifuge/substrate-pallet-multi-account/master/example/2-bob-calls.png)
+
+The multisig operation is executed:
+![The multisig operation is executed](https://raw.githubusercontent.com/centrifuge/substrate-pallet-multi-account/master/example/3-multisig-executed-event.png)
+
+
 ## Interface
 
 ### Dispatchable Functions
