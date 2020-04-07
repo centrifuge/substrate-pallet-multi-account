@@ -1511,10 +1511,19 @@ mod tests {
             ));
 
             let mut events = System::events();
-            assert_eq!(events.pop().unwrap().event, TestEvent::pallet_multi_account(
-                RawEvent::MultisigExecuted(2, now(), multi_id, Ok(()))));
-            assert_eq!(events.pop().unwrap().event, TestEvent::pallet_multi_account(
-                RawEvent::MultiAccountUpdated(multi_id)));
+            assert_eq!(
+                events.pop().unwrap().event,
+                TestEvent::pallet_multi_account(RawEvent::MultisigExecuted(
+                    2,
+                    now(),
+                    multi_id,
+                    Ok(())
+                ))
+            );
+            assert_eq!(
+                events.pop().unwrap().event,
+                TestEvent::pallet_multi_account(RawEvent::MultiAccountUpdated(multi_id))
+            );
 
             // multi account updated
             assert_eq!(
@@ -1565,10 +1574,19 @@ mod tests {
             ));
 
             let mut events = System::events();
-            assert_eq!(events.pop().unwrap().event, TestEvent::pallet_multi_account(
-                RawEvent::MultisigExecuted(2, now(), multi_id, Ok(()))));
-            assert_eq!(events.pop().unwrap().event, TestEvent::pallet_multi_account(
-                RawEvent::MultiAccountRemoved(multi_id)));
+            assert_eq!(
+                events.pop().unwrap().event,
+                TestEvent::pallet_multi_account(RawEvent::MultisigExecuted(
+                    2,
+                    now(),
+                    multi_id,
+                    Ok(())
+                ))
+            );
+            assert_eq!(
+                events.pop().unwrap().event,
+                TestEvent::pallet_multi_account(RawEvent::MultiAccountRemoved(multi_id))
+            );
 
             // multi account updated
             assert_eq!(<MultiAccounts<Test>>::get(&multi_id), None);
