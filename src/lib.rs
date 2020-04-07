@@ -522,9 +522,9 @@ decl_module! {
                     Err(Error::<T>::AlreadyApproved)?
                 }
 
-                let result = call.dispatch(frame_system::RawOrigin::Signed(multi_account_id.clone()).into());
                 let _ = T::Currency::unreserve(&m.depositor, m.deposit);
                 <Multisigs<T>>::remove(&multi_account_id, call_hash);
+                let result = call.dispatch(frame_system::RawOrigin::Signed(multi_account_id.clone()).into());
                 Self::deposit_event(RawEvent::MultisigExecuted(who, timepoint, multi_account_id, result));
             } else {
                 ensure!(maybe_timepoint.is_none(), Error::<T>::UnexpectedTimepoint);
@@ -810,6 +810,7 @@ mod tests {
     type Balances = pallet_balances::Module<Test>;
     type MultiAccount = Module<Test>;
 
+    use crate::Call as MultiAccountCall;
     use pallet_balances::Call as BalancesCall;
     use pallet_balances::Error as BalancesError;
 
@@ -1470,6 +1471,107 @@ mod tests {
             assert_ok!(MultiAccount::call(Origin::signed(1), multi_id, None, call));
 
             assert_eq!(Balances::free_balance(6), 15);
+        });
+    }
+
+    #[test]
+    fn multiaccount_update_works() {
+        new_test_ext().execute_with(|| {
+            let multi_id = MultiAccount::multi_account_id(2);
+            assert_ok!(Balances::transfer(Origin::signed(1), multi_id, 5));
+            assert_ok!(Balances::transfer(Origin::signed(2), multi_id, 5));
+            assert_ok!(Balances::transfer(Origin::signed(3), multi_id, 5));
+
+            assert_ok!(MultiAccount::create(Origin::signed(1), 2, vec![2, 3]));
+            assert_eq!(
+                <MultiAccounts<Test>>::get(&multi_id),
+                Some(MultiAccountData {
+                    threshold: 2,
+                    signatories: vec![1, 2, 3],
+                    deposit: 4,
+                    depositor: 1,
+                })
+            );
+
+            // call to remove signatory 3 and reduce threshold from 2 to 1
+            let call = Box::new(Call::MultiAccount(MultiAccountCall::update(1, vec![1, 2])));
+            let hash = call.using_encoded(blake2_256);
+            assert_ok!(MultiAccount::approve(
+                Origin::signed(1),
+                multi_id,
+                None,
+                hash
+            ));
+
+            assert_ok!(MultiAccount::call(
+                Origin::signed(2),
+                multi_id,
+                Some(now()),
+                call.clone()
+            ));
+
+            let mut events = System::events();
+            assert_eq!(events.pop().unwrap().event, TestEvent::pallet_multi_account(
+                RawEvent::MultisigExecuted(2, now(), multi_id, Ok(()))));
+            assert_eq!(events.pop().unwrap().event, TestEvent::pallet_multi_account(
+                RawEvent::MultiAccountUpdated(multi_id)));
+
+            // multi account updated
+            assert_eq!(
+                <MultiAccounts<Test>>::get(&multi_id),
+                Some(MultiAccountData {
+                    threshold: 1,
+                    signatories: vec![1, 2],
+                    deposit: 3,
+                    depositor: multi_id,
+                })
+            );
+        });
+    }
+
+    #[test]
+    fn multiaccount_remove_works() {
+        new_test_ext().execute_with(|| {
+            let multi_id = MultiAccount::multi_account_id(2);
+            assert_ok!(Balances::transfer(Origin::signed(1), multi_id, 5));
+            assert_ok!(Balances::transfer(Origin::signed(2), multi_id, 5));
+
+            assert_ok!(MultiAccount::create(Origin::signed(1), 2, vec![2]));
+            assert_eq!(
+                <MultiAccounts<Test>>::get(&multi_id),
+                Some(MultiAccountData {
+                    threshold: 2,
+                    signatories: vec![1, 2],
+                    deposit: 3,
+                    depositor: 1,
+                })
+            );
+
+            // call to remove the multi account
+            let call = Box::new(Call::MultiAccount(MultiAccountCall::remove()));
+            let hash = call.using_encoded(blake2_256);
+            assert_ok!(MultiAccount::approve(
+                Origin::signed(1),
+                multi_id,
+                None,
+                hash
+            ));
+
+            assert_ok!(MultiAccount::call(
+                Origin::signed(2),
+                multi_id,
+                Some(now()),
+                call.clone()
+            ));
+
+            let mut events = System::events();
+            assert_eq!(events.pop().unwrap().event, TestEvent::pallet_multi_account(
+                RawEvent::MultisigExecuted(2, now(), multi_id, Ok(()))));
+            assert_eq!(events.pop().unwrap().event, TestEvent::pallet_multi_account(
+                RawEvent::MultiAccountRemoved(multi_id)));
+
+            // multi account updated
+            assert_eq!(<MultiAccounts<Test>>::get(&multi_id), None);
         });
     }
 
