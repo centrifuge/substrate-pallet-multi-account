@@ -1539,6 +1539,54 @@ mod tests {
     }
 
     #[test]
+    fn multiaccount_update_other_way_works() {
+        new_test_ext().execute_with(|| {
+            let multi_id = MultiAccount::multi_account_id(2);
+            assert_ok!(Balances::transfer(Origin::signed(1), multi_id, 5));
+            assert_ok!(Balances::transfer(Origin::signed(2), multi_id, 5));
+            assert_ok!(Balances::transfer(Origin::signed(3), multi_id, 5));
+
+            assert_ok!(MultiAccount::create(Origin::signed(1), 1, vec![]));
+            assert_eq!(
+                <MultiAccounts<Test>>::get(&multi_id),
+                Some(MultiAccountData {
+                    threshold: 1,
+                    signatories: vec![1],
+                    deposit: 2,
+                    depositor: 1,
+                })
+            );
+
+            // call to add sigatory 2, increase threshold to 2
+            let call = Box::new(Call::MultiAccount(MultiAccountCall::update(2, vec![1, 2])));
+
+            assert_ok!(MultiAccount::call(
+                Origin::signed(1),
+                multi_id,
+                None,
+                call.clone()
+            ));
+
+            let mut events = System::events();
+            assert_eq!(
+                events.pop().unwrap().event,
+                TestEvent::pallet_multi_account(RawEvent::MultiAccountUpdated(multi_id))
+            );
+
+            // multi account updated
+            assert_eq!(
+                <MultiAccounts<Test>>::get(&multi_id),
+                Some(MultiAccountData {
+                    threshold: 2,
+                    signatories: vec![1, 2],
+                    deposit: 3,
+                    depositor: multi_id,
+                })
+            );
+        });
+    }
+
+    #[test]
     fn multiaccount_remove_works() {
         new_test_ext().execute_with(|| {
             let multi_id = MultiAccount::multi_account_id(2);
