@@ -1259,7 +1259,7 @@ mod tests {
     }
 
     #[test]
-    fn can_not_cancel_when_none_has_approve() {
+    fn can_not_cancel_when_none_has_approve_yet() {
         new_test_ext().execute_with(|| {
             let multi_id = MultiAccount::multi_account_id(2);
 
