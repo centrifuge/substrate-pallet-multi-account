@@ -1181,6 +1181,100 @@ mod tests {
     }
 
     #[test]
+    fn can_cancel_after_1_approve() {
+        new_test_ext().execute_with(|| {
+            let multi_id = MultiAccount::multi_account_id(2);
+
+            assert_ok!(MultiAccount::create(Origin::signed(1), 3, vec![2, 3]));
+
+            let call = Box::new(Call::Balances(BalancesCall::transfer(6, 15)));
+            let hash = call.using_encoded(blake2_256);
+            assert_ok!(MultiAccount::approve(
+                Origin::signed(1),
+                multi_id,
+                None,
+                hash.clone()
+            ));
+            assert_ok!(
+                MultiAccount::cancel(Origin::signed(1), multi_id, now(), hash.clone()),
+            );
+        });
+    }
+
+    #[test]
+    fn other_signatories_can_approve_first() {
+        new_test_ext().execute_with(|| {
+            let multi_id = MultiAccount::multi_account_id(2);
+
+            assert_ok!(MultiAccount::create(Origin::signed(1), 3, vec![2, 3]));
+
+            let call = Box::new(Call::Balances(BalancesCall::transfer(6, 15)));
+            let hash = call.using_encoded(blake2_256);
+            assert_ok!(MultiAccount::approve(
+                Origin::signed(2),
+                multi_id,
+                None,
+                hash.clone()
+            ));
+            assert_ok!(MultiAccount::approve(
+                Origin::signed(3),
+                multi_id,
+                Some(now()),
+                hash.clone()
+            ));
+            assert_ok!(MultiAccount::approve(
+                Origin::signed(1),
+                multi_id,
+                Some(now()),
+                hash.clone()
+            ));
+        });
+    }
+
+    #[test]
+    fn can_cancel_after_2_approve() {
+        new_test_ext().execute_with(|| {
+            let multi_id = MultiAccount::multi_account_id(2);
+
+            assert_ok!(MultiAccount::create(Origin::signed(1), 3, vec![2, 3]));
+
+            let call = Box::new(Call::Balances(BalancesCall::transfer(6, 15)));
+            let hash = call.using_encoded(blake2_256);
+            assert_ok!(MultiAccount::approve(
+                Origin::signed(1),
+                multi_id,
+                None,
+                hash.clone()
+            ));
+            assert_ok!(MultiAccount::approve(
+                Origin::signed(2),
+                multi_id,
+                Some(now()),
+                hash.clone()
+            ));
+            assert_ok!(
+                MultiAccount::cancel(Origin::signed(1), multi_id, now(), hash.clone()),
+            );
+        });
+    }
+
+    #[test]
+    fn can_not_cancel_when_none_has_approve() {
+        new_test_ext().execute_with(|| {
+            let multi_id = MultiAccount::multi_account_id(2);
+
+            assert_ok!(MultiAccount::create(Origin::signed(1), 3, vec![2, 3]));
+
+            let call = Box::new(Call::Balances(BalancesCall::transfer(6, 15)));
+            let hash = call.using_encoded(blake2_256);
+            assert_noop!(
+                MultiAccount::cancel(Origin::signed(1), multi_id, now(), hash.clone()),
+                Error::<Test>::NotFound,
+            );
+        });
+    }
+
+    #[test]
     fn multisig_2_of_3_call_works() {
         new_test_ext().execute_with(|| {
             let multi_id = MultiAccount::multi_account_id(2);
