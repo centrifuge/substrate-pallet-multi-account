@@ -222,6 +222,8 @@ decl_error! {
         UnexpectedTimepoint,
         /// There are active multisigs for this multi account; cancel them first.
         ActiveMultisigs,
+		/// batched Multisig cancel operation did not complete
+		MultisigCancelIncomplete
     }
 }
 
@@ -668,33 +670,32 @@ decl_module! {
             Ok(())
         }
 
-		#[weight = SimpleDispatchInfo::FixedNormal(1_000_000)]
-		fn clear(origin, multi_account_ids: Vec<T::AccountId>, timepoint: Timepoint<T::BlockNumber>, call_hash: [u8; 32]) -> DispatchResult {
-			for m_id in multi_account_ids{
-				Self::cancel(origin.clone(), m_id, timepoint, call_hash)?;
+        #[weight = FunctionOf(
+            |args: (&T::AccountId, &u8, &[u8; 32], &Timepoint<T::BlockNumber>)| 500_000 * (*args.1 as u32),
+            DispatchClass::Normal,
+            true
+        )]
+		fn clear(origin, multi_account_id: T::AccountId, max_cancellations: u8, call_hash: [u8; 32], timepoint: Timepoint<T::BlockNumber>) -> DispatchResult {
+			let mut succeeded = 0;
+			let who = ensure_signed(origin)?;
+			let mut cancelled_multisigs = Vec::with_capacity(max_cancellations as usize);
+			let active_multisigs = <Multisigs<T>>::iter_prefix(&who);
+			for m_sig in active_multisigs.take(max_cancellations as usize){
+				ensure!(m_sig.when == timepoint, Error::<T>::WrongTimepoint);
+				ensure!(who == multi_account_id || who == m_sig.depositor, Error::<T>::NotOwner);
+
+				let _ = T::Currency::unreserve(&m_sig.depositor, m_sig.deposit);
+				<Multisigs<T>>::remove(&multi_account_id, call_hash);
+				cancelled_multisigs.push(m_sig);
+				succeeded += 1;
+			}
+			ensure!(succeeded == max_cancellations, Error::<T>::MultisigCancelIncomplete);
+			for m_sig in cancelled_multisigs{
+				Self::deposit_event(RawEvent::MultisigCancelled(m_sig.depositor, timepoint, multi_account_id.clone()));
 			}
 			Ok(())
 		}
 
-		#[weight = SimpleDispatchInfo::FixedNormal(1_000_000)]
-		fn clear2(origin, multi_account_ids: Vec<T::AccountId>, timepoint: Timepoint<T::BlockNumber>, call_hash: [u8; 32]) -> DispatchResult {
-
-			for m_id in multi_account_ids.iter(){
-				let who = ensure_signed(origin.clone())?;
-				let m = <Multisigs<T>>::get(&m_id, call_hash)
-					.ok_or(Error::<T>::NotFound)?;
-				ensure!(m.when == timepoint, Error::<T>::WrongTimepoint);
-				ensure!(who == *m_id || who == m.depositor, Error::<T>::NotOwner);
-
-				let _ = T::Currency::unreserve(&m.depositor, m.deposit);
-				<Multisigs<T>>::remove(&m_id, call_hash);
-			}
-
-			for m_id in multi_account_ids{
-				Self::deposit_event(RawEvent::MultisigCancelled(m.depositor, timepoint, m_id));
-			}
-			Ok(())
-		}
     }
 }
 
