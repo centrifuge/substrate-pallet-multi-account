@@ -667,6 +667,34 @@ decl_module! {
 
             Ok(())
         }
+
+		#[weight = SimpleDispatchInfo::FixedNormal(1_000_000)]
+		fn clear(origin, multi_account_ids: Vec<T::AccountId>, timepoint: Timepoint<T::BlockNumber>, call_hash: [u8; 32]) -> DispatchResult {
+			for m_id in multi_account_ids{
+				Self::cancel(origin.clone(), m_id, timepoint, call_hash)?;
+			}
+			Ok(())
+		}
+
+		#[weight = SimpleDispatchInfo::FixedNormal(1_000_000)]
+		fn clear2(origin, multi_account_ids: Vec<T::AccountId>, timepoint: Timepoint<T::BlockNumber>, call_hash: [u8; 32]) -> DispatchResult {
+
+			for m_id in multi_account_ids.iter(){
+				let who = ensure_signed(origin.clone())?;
+				let m = <Multisigs<T>>::get(&m_id, call_hash)
+					.ok_or(Error::<T>::NotFound)?;
+				ensure!(m.when == timepoint, Error::<T>::WrongTimepoint);
+				ensure!(who == *m_id || who == m.depositor, Error::<T>::NotOwner);
+
+				let _ = T::Currency::unreserve(&m.depositor, m.deposit);
+				<Multisigs<T>>::remove(&m_id, call_hash);
+			}
+
+			for m_id in multi_account_ids{
+				Self::deposit_event(RawEvent::MultisigCancelled(m.depositor, timepoint, m_id));
+			}
+			Ok(())
+		}
     }
 }
 
