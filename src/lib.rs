@@ -671,11 +671,11 @@ decl_module! {
         }
 
         #[weight = FunctionOf(
-            |args: (&T::AccountId, &u8, &[u8; 32], &Timepoint<T::BlockNumber>)| 500_000 * (*args.1 as u32),
+            |args: (&T::AccountId, &u8, &Timepoint<T::BlockNumber>)| 500_000 * (*args.1 as u32),
             DispatchClass::Normal,
             true
         )]
-		fn clear(origin, multi_account_id: T::AccountId, max_cancellations: u8, call_hash: [u8; 32], timepoint: Timepoint<T::BlockNumber>) -> DispatchResult {
+		fn clear(origin, multi_account_id: T::AccountId, max_cancellations: u8, timepoint: Timepoint<T::BlockNumber>) -> DispatchResult {
 			let mut succeeded = 0;
 			let who = ensure_signed(origin)?;
 			let mut cancelled_multisigs = Vec::with_capacity(max_cancellations as usize);
@@ -684,11 +684,13 @@ decl_module! {
 				ensure!(who == multi_account_id || who == m_sig.depositor, Error::<T>::NotOwner);
 
 				let _ = T::Currency::unreserve(&m_sig.depositor, m_sig.deposit);
-				<Multisigs<T>>::remove(&multi_account_id, call_hash);
 				cancelled_multisigs.push(m_sig);
 				succeeded += 1;
 			}
+
+			<Multisigs<T>>::remove_prefix(&multi_account_id);
 			ensure!(succeeded == max_cancellations, Error::<T>::MultisigCancelIncomplete);
+
 			for m_sig in cancelled_multisigs{
 				Self::deposit_event(RawEvent::MultisigCancelled(m_sig.depositor, timepoint, multi_account_id.clone()));
 			}
