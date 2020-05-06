@@ -681,7 +681,6 @@ decl_module! {
 			let mut cancelled_multisigs = Vec::with_capacity(max_cancellations as usize);
 			let active_multisigs = <Multisigs<T>>::iter_prefix(&who);
 			for m_sig in active_multisigs.take(max_cancellations as usize){
-				ensure!(m_sig.when == timepoint, Error::<T>::WrongTimepoint);
 				ensure!(who == multi_account_id || who == m_sig.depositor, Error::<T>::NotOwner);
 
 				let _ = T::Currency::unreserve(&m_sig.depositor, m_sig.deposit);
