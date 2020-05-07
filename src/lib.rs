@@ -689,11 +689,13 @@ decl_module! {
 			}
 
 			<Multisigs<T>>::remove_prefix(&multi_account_id);
-			ensure!(succeeded == max_cancellations, Error::<T>::MultisigCancelIncomplete);
 
 			for m_sig in cancelled_multisigs{
 				Self::deposit_event(RawEvent::MultisigCancelled(m_sig.depositor, timepoint, multi_account_id.clone()));
 			}
+
+			ensure!(succeeded == max_cancellations, Error::<T>::MultisigCancelIncomplete);
+
 			Ok(())
 		}
 
