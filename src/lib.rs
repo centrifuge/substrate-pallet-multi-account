@@ -679,7 +679,7 @@ decl_module! {
 			let mut succeeded = 0;
 			let who = ensure_signed(origin)?;
 			let mut cancelled_multisigs = Vec::with_capacity(max_cancellations as usize);
-			let active_multisigs = <Multisigs<T>>::iter_prefix(&who);
+			let active_multisigs = <Multisigs<T>>::iter_prefix(&multi_account_id);
 			for m_sig in active_multisigs.take(max_cancellations as usize){
 				ensure!(who == multi_account_id || who == m_sig.depositor, Error::<T>::NotOwner);
 
