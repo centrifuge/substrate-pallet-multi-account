@@ -682,10 +682,12 @@ decl_module! {
 			let active_multisigs = <Multisigs<T>>::iter_prefix(&multi_account_id);
 			for m_sig in active_multisigs.take(max_cancellations as usize){
 				ensure!(who == multi_account_id || who == m_sig.depositor, Error::<T>::NotOwner);
-
-				let _ = T::Currency::unreserve(&m_sig.depositor, m_sig.deposit);
 				cancelled_multisigs.push(m_sig);
 				succeeded += 1;
+			}
+
+			for m_sig in cancelled_multisigs.iter(){
+				let _ = T::Currency::unreserve(&m_sig.depositor, m_sig.deposit);
 			}
 
 			<Multisigs<T>>::remove_prefix(&multi_account_id);
