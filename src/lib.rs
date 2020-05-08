@@ -1026,7 +1026,7 @@ mod tests {
     }
 
     #[test]
-    fn cleaar_multisig_works() {
+    fn clear_multisig_works() {
         new_test_ext().execute_with(|| {
             let multi_id = MultiAccount::multi_account_id(2);
             let call = Box::new(Call::Balances(BalancesCall::transfer(6, 15)));
