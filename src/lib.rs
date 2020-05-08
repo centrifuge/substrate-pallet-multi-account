@@ -670,6 +670,7 @@ decl_module! {
             Ok(())
         }
 
+		/// TODO: doc-comments
         #[weight = FunctionOf(
             |args: (&T::AccountId, &u8, &Timepoint<T::BlockNumber>)| 500_000 * (*args.1 as u32),
             DispatchClass::Normal,
@@ -1017,6 +1018,39 @@ mod tests {
                 multi_id,
                 now(),
                 hash.clone()
+            ),);
+            assert_eq!(Balances::free_balance(1), 16);
+            assert_eq!(Balances::reserved_balance(1), 4);
+            expect_event(RawEvent::MultisigCancelled(1, now(), multi_id));
+        });
+    }
+
+    #[test]
+    fn cleaar_multisig_works() {
+        new_test_ext().execute_with(|| {
+            let multi_id = MultiAccount::multi_account_id(2);
+            let call = Box::new(Call::Balances(BalancesCall::transfer(6, 15)));
+            let hash = call.using_encoded(blake2_256);
+            assert_ok!(MultiAccount::create(Origin::signed(1), 3, vec![2, 3]));
+            assert_ok!(MultiAccount::approve(
+                Origin::signed(1),
+                multi_id,
+                None,
+                hash.clone()
+            ));
+            assert_ok!(MultiAccount::approve(
+                Origin::signed(2),
+                multi_id,
+                Some(now()),
+                hash.clone()
+            ));
+            assert_eq!(Balances::free_balance(1), 12);
+            assert_eq!(Balances::reserved_balance(1), 8);
+            assert_ok!(MultiAccount::clear(
+                Origin::signed(1),
+                multi_id,
+				1,
+                now(),
             ),);
             assert_eq!(Balances::free_balance(1), 16);
             assert_eq!(Balances::reserved_balance(1), 4);
