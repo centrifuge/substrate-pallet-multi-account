@@ -1164,9 +1164,12 @@ mod tests {
                 None,
                 hash.clone()
             ));
-            assert_ok!(
-                MultiAccount::cancel(Origin::signed(1), multi_id, now(), hash.clone()),
-            );
+            assert_ok!(MultiAccount::cancel(
+                Origin::signed(1),
+                multi_id,
+                now(),
+                hash.clone()
+            ),);
             assert_noop!(
                 MultiAccount::cancel(Origin::signed(1), multi_id, now(), hash.clone()),
                 Error::<Test>::NotFound,
@@ -1189,9 +1192,12 @@ mod tests {
                 None,
                 hash.clone()
             ));
-            assert_ok!(
-                MultiAccount::cancel(Origin::signed(1), multi_id, now(), hash.clone()),
-            );
+            assert_ok!(MultiAccount::cancel(
+                Origin::signed(1),
+                multi_id,
+                now(),
+                hash.clone()
+            ),);
         });
     }
 
@@ -1246,9 +1252,12 @@ mod tests {
                 Some(now()),
                 hash.clone()
             ));
-            assert_ok!(
-                MultiAccount::cancel(Origin::signed(1), multi_id, now(), hash.clone()),
-            );
+            assert_ok!(MultiAccount::cancel(
+                Origin::signed(1),
+                multi_id,
+                now(),
+                hash.clone()
+            ),);
         });
     }
 
