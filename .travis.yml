@@ -28,6 +28,7 @@ before_script:
 script:
 - cargo build
 - cargo test
+- cargo fmt -- --check
 
 after_success: |
     cargo test &&
