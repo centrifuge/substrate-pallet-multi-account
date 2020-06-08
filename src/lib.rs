@@ -168,7 +168,7 @@ decl_storage! {
 
         /// The set of multi accounts.
         pub MultiAccounts: map
-            hasher(blake2_256) T::AccountId
+            hasher(opaque_blake2_256) T::AccountId
             => Option<MultiAccountData<BalanceOf<T>, T::AccountId>>;
 
         /// The set of open multisig operations.
@@ -778,6 +778,7 @@ mod tests {
         type AccountData = pallet_balances::AccountData<u64>;
         type OnNewAccount = ();
         type OnKilledAccount = ();
+        type MigrateAccount = ();
     }
     parameter_types! {
         pub const ExistentialDeposit: u64 = 1;
