@@ -525,7 +525,9 @@ decl_module! {
                 let _ = T::Currency::unreserve(&m.depositor, m.deposit);
                 <Multisigs<T>>::remove(&multi_account_id, call_hash);
                 let result = call.dispatch(frame_system::RawOrigin::Signed(multi_account_id.clone()).into());
-                Self::deposit_event(RawEvent::MultisigExecuted(who, timepoint, multi_account_id, result));
+                Self::deposit_event(RawEvent::MultisigExecuted(
+                    who, timepoint, multi_account_id, result.map(|_| ()).map_err(|e| e.error)
+                ));
             } else {
                 ensure!(maybe_timepoint.is_none(), Error::<T>::UnexpectedTimepoint);
                 if multi_account.threshold > 1 {
@@ -541,6 +543,7 @@ decl_module! {
                     Self::deposit_event(RawEvent::NewMultisig(who, multi_account_id));
                 } else {
                     return call.dispatch(frame_system::RawOrigin::Signed(multi_account_id).into())
+                        .map(|_| ()).map_err(|e| e.error)
                 }
             }
 
@@ -778,7 +781,6 @@ mod tests {
         type AccountData = pallet_balances::AccountData<u64>;
         type OnNewAccount = ();
         type OnKilledAccount = ();
-        type MigrateAccount = ();
     }
     parameter_types! {
         pub const ExistentialDeposit: u64 = 1;
@@ -829,7 +831,9 @@ mod tests {
         }
         .assimilate_storage(&mut t)
         .unwrap();
-        t.into()
+        let mut ext = sp_io::TestExternalities::new(t);
+        ext.execute_with(|| System::set_block_number(1));
+        ext
     }
 
     fn last_event() -> TestEvent {
