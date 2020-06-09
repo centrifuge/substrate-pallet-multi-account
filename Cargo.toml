@@ -1,7 +1,7 @@
 [package]
 name = "substrate-pallet-multi-account"
 description = "A pallet/runtime module for Substrate with multisig functionality with a static `AccountId` and a dynamic `threshold` and set of `signatories`."
-version = "2.0.0-alpha.6"
+version = "2.0.0-alpha.8"
 authors = ["Philip Stanislaus <6912756+philipstanislaus@users.noreply.github.com>"]
 edition = "2018"
 license = "LGPL-3.0"
@@ -11,16 +11,16 @@ repository = "https://github.com/centrifuge/substrate-pallet-multi-account/"
 [dependencies]
 serde = { version = "1.0.102", optional = true }
 codec = { package = "parity-scale-codec", version = "1.3.0", default-features = false }
-frame-support = { version = "2.0.0-alpha.6", default-features = false, git = "https://github.com/paritytech/substrate.git", rev = "67f354f57e738fa575775f7fa0fb903e8972182b" }
-frame-system = { version = "2.0.0-alpha.6", default-features = false, git = "https://github.com/paritytech/substrate.git", rev = "67f354f57e738fa575775f7fa0fb903e8972182b" }
-sp-core = { version = "2.0.0-alpha.6", default-features = false, git = "https://github.com/paritytech/substrate.git", rev = "67f354f57e738fa575775f7fa0fb903e8972182b" }
-sp-runtime = { version = "2.0.0-alpha.6", default-features = false, git = "https://github.com/paritytech/substrate.git", rev = "67f354f57e738fa575775f7fa0fb903e8972182b" }
-sp-std = { version = "2.0.0-alpha.6", default-features = false, git = "https://github.com/paritytech/substrate.git", rev = "67f354f57e738fa575775f7fa0fb903e8972182b" }
-sp-io = { version = "2.0.0-alpha.6", default-features = false, git = "https://github.com/paritytech/substrate.git", rev = "67f354f57e738fa575775f7fa0fb903e8972182b" }
+frame-support = { version = "2.0.0-alpha.8", default-features = false, git = "https://github.com/paritytech/substrate.git", rev = "7e9a2ae78d27cc56e053fbec3b34a1a258b89561" }
+frame-system = { version = "2.0.0-alpha.8", default-features = false, git = "https://github.com/paritytech/substrate.git", rev = "7e9a2ae78d27cc56e053fbec3b34a1a258b89561" }
+sp-core = { version = "2.0.0-alpha.8", default-features = false, git = "https://github.com/paritytech/substrate.git", rev = "7e9a2ae78d27cc56e053fbec3b34a1a258b89561" }
+sp-runtime = { version = "2.0.0-alpha.8", default-features = false, git = "https://github.com/paritytech/substrate.git", rev = "7e9a2ae78d27cc56e053fbec3b34a1a258b89561" }
+sp-std = { version = "2.0.0-alpha.8", default-features = false, git = "https://github.com/paritytech/substrate.git", rev = "7e9a2ae78d27cc56e053fbec3b34a1a258b89561" }
+sp-io = { version = "2.0.0-alpha.8", default-features = false, git = "https://github.com/paritytech/substrate.git", rev = "7e9a2ae78d27cc56e053fbec3b34a1a258b89561" }
 
 [dev-dependencies]
-sp-core = { version = "2.0.0-alpha.6", git = "https://github.com/paritytech/substrate.git", rev = "67f354f57e738fa575775f7fa0fb903e8972182b" }
-pallet-balances = { version = "2.0.0-alpha.6", git = "https://github.com/paritytech/substrate.git", rev = "67f354f57e738fa575775f7fa0fb903e8972182b" }
+sp-core = { version = "2.0.0-alpha.8", git = "https://github.com/paritytech/substrate.git", rev = "7e9a2ae78d27cc56e053fbec3b34a1a258b89561" }
+pallet-balances = { version = "2.0.0-alpha.8", git = "https://github.com/paritytech/substrate.git", rev = "7e9a2ae78d27cc56e053fbec3b34a1a258b89561" }
 
 [features]
 default = ["std"]
