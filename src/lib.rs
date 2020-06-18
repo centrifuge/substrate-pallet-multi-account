@@ -785,6 +785,7 @@ mod tests {
         type DbWeight = ();
         type BlockExecutionWeight = ();
         type ExtrinsicBaseWeight = ();
+        type MaximumExtrinsicWeight = ();
     }
     parameter_types! {
         pub const ExistentialDeposit: u64 = 1;
