@@ -72,11 +72,12 @@
 
 use codec::{Decode, Encode};
 use frame_support::{
-    decl_error, decl_event, decl_module, decl_storage, ensure, Parameter, RuntimeDebug,
+    decl_error, decl_event, decl_module, decl_storage, ensure, storage::IterableStorageDoubleMap,
+    Parameter, RuntimeDebug,
 };
 use frame_support::{
     traits::{Currency, Get, ReservableCurrency},
-    weights::{DispatchClass, FunctionOf, GetDispatchInfo, SimpleDispatchInfo},
+    weights::{DispatchClass, FunctionOf, GetDispatchInfo, Pays},
 };
 use frame_system::{self as system, ensure_signed};
 use sp_core::TypeId;
@@ -168,7 +169,7 @@ decl_storage! {
 
         /// The set of multi accounts.
         pub MultiAccounts: map
-            hasher(blake2_256) T::AccountId
+            hasher(opaque_blake2_256) T::AccountId
             => Option<MultiAccountData<BalanceOf<T>, T::AccountId>>;
 
         /// The set of open multisig operations.
@@ -296,9 +297,9 @@ decl_module! {
         ///   `MultiAccountDepositBase + other_signatories.len() * MultiAccountDepositFactor`.
         /// # </weight>
         #[weight = FunctionOf(
-            |args: (&u16, &Vec<T::AccountId>)| 10_000 * (args.1.len() as u32 + 1),
+            |args: (&u16, &Vec<T::AccountId>)| 10_000 * (args.1.len() as u64 + 1),
             DispatchClass::Normal,
-            true
+            Pays::Yes
         )]
         fn create(origin,
             threshold: u16,
@@ -367,9 +368,9 @@ decl_module! {
         ///   `MultiAccountDepositBase + signatories.len() * MultiAccountDepositFactor`.
         /// # </weight>
         #[weight = FunctionOf(
-            |args: (&u16, &Vec<T::AccountId>)| 10_000 * (args.1.len() as u32 + 1),
+            |args: (&u16, &Vec<T::AccountId>)| (10_000 * args.1.len() as u64 + 1),
             DispatchClass::Normal,
-            true
+            Pays::Yes
         )]
         fn update(origin,
             threshold: u16,
@@ -429,7 +430,7 @@ decl_module! {
         /// - One event.
         /// - Storage: removes one item, value size bounded by `MaxSignatories`.
         /// # </weight>
-        #[weight = SimpleDispatchInfo::FixedNormal(1_000_000)]
+        #[weight = 1_000_000]
         fn remove(origin) -> DispatchResult {
             let who = ensure_signed(origin)?;
             let multi_account = <MultiAccounts<T>>::get(&who).ok_or(Error::<T>::MultiAccountNotFound)?;
@@ -489,7 +490,7 @@ decl_module! {
         #[weight = FunctionOf(
             |args: (&T::AccountId, &Option<Timepoint<T::BlockNumber>>, &Box<<T as Trait>::Call>)| args.2.get_dispatch_info().weight,
             |args: (&T::AccountId, &Option<Timepoint<T::BlockNumber>>, &Box<<T as Trait>::Call>)| args.2.get_dispatch_info().class,
-            true
+            Pays::Yes
         )]
         fn call(origin,
             multi_account_id: T::AccountId,
@@ -525,7 +526,9 @@ decl_module! {
                 let _ = T::Currency::unreserve(&m.depositor, m.deposit);
                 <Multisigs<T>>::remove(&multi_account_id, call_hash);
                 let result = call.dispatch(frame_system::RawOrigin::Signed(multi_account_id.clone()).into());
-                Self::deposit_event(RawEvent::MultisigExecuted(who, timepoint, multi_account_id, result));
+                Self::deposit_event(RawEvent::MultisigExecuted(
+                    who, timepoint, multi_account_id, result.map(|_| ()).map_err(|e| e.error)
+                ));
             } else {
                 ensure!(maybe_timepoint.is_none(), Error::<T>::UnexpectedTimepoint);
                 if multi_account.threshold > 1 {
@@ -541,6 +544,7 @@ decl_module! {
                     Self::deposit_event(RawEvent::NewMultisig(who, multi_account_id));
                 } else {
                     return call.dispatch(frame_system::RawOrigin::Signed(multi_account_id).into())
+                        .map(|_| ()).map_err(|e| e.error)
                 }
             }
 
@@ -577,7 +581,7 @@ decl_module! {
         ///   deposit taken for its lifetime of
         ///   `MultisigDepositBase + threshold * MultisigDepositFactor`.
         /// # </weight>
-        #[weight = SimpleDispatchInfo::FixedNormal(1_000_000)]
+        #[weight = 1_000_000]
         fn approve(origin,
             multi_account_id: T::AccountId,
             maybe_timepoint: Option<Timepoint<T::BlockNumber>>,
@@ -647,7 +651,7 @@ decl_module! {
         /// - I/O: 1 read `O(S)`, one remove.
         /// - Storage: removes one item.
         /// # </weight>
-        #[weight = SimpleDispatchInfo::FixedNormal(1_000_000)]
+        #[weight = 1_000_000]
         fn cancel(origin,
             multi_account_id: T::AccountId,
             timepoint: Timepoint<T::BlockNumber>,
@@ -778,6 +782,10 @@ mod tests {
         type AccountData = pallet_balances::AccountData<u64>;
         type OnNewAccount = ();
         type OnKilledAccount = ();
+        type DbWeight = ();
+        type BlockExecutionWeight = ();
+        type ExtrinsicBaseWeight = ();
+        type MaximumExtrinsicWeight = ();
     }
     parameter_types! {
         pub const ExistentialDeposit: u64 = 1;
@@ -828,7 +836,9 @@ mod tests {
         }
         .assimilate_storage(&mut t)
         .unwrap();
-        t.into()
+        let mut ext = sp_io::TestExternalities::new(t);
+        ext.execute_with(|| System::set_block_number(1));
+        ext
     }
 
     fn last_event() -> TestEvent {
