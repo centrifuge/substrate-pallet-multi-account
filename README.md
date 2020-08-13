@@ -6,6 +6,12 @@
 
 A pallet/runtime module for [Substrate](https://github.com/paritytech/substrate) with multisig functionality with a static `AccountId` and a dynamic `threshold` and set of `signatories`.
 
+## DEPRECATED
+This library has been deprecated in favor of a combined usage of Substrate Proxy and Multisig.
+
+- https://github.com/paritytech/substrate/blob/master/frame/proxy/src/lib.rs
+- https://github.com/paritytech/substrate/blob/master/frame/multisig/src/lib.rs
+
 ## Overview
 
 This module contains functionality to create, update and remove multi accounts, identified by a deterministically generated account ID, as well as (potentially) stateful multisig dispatches.

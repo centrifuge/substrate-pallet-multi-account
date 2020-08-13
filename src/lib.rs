@@ -296,46 +296,46 @@ decl_module! {
         ///   deposit taken for its lifetime of
         ///   `MultiAccountDepositBase + other_signatories.len() * MultiAccountDepositFactor`.
         /// # </weight>
-        #[weight = FunctionOf(
-            |args: (&u16, &Vec<T::AccountId>)| 10_000 * (args.1.len() as u64 + 1),
-            DispatchClass::Normal,
-            Pays::Yes
-        )]
-        fn create(origin,
-            threshold: u16,
-            other_signatories: Vec<T::AccountId>
-        ) -> DispatchResult {
-            let who = ensure_signed(origin)?;
-            ensure!(threshold >= 1, Error::<T>::ZeroThreshold);
-            let max_sigs = T::MaxSignatories::get() as usize;
-            ensure!(threshold as usize <= other_signatories.len() + 1, Error::<T>::TooFewSignatories);
-            ensure!(other_signatories.len() < max_sigs, Error::<T>::TooManySignatories);
-            let signatories = Self::ensure_sorted_and_insert(other_signatories.clone(), who.clone())?;
-
-            let multi_account_index = MultiAccountIndex::get()
-                .checked_add(1)
-                .expect("multi account indices will never reach 2^64 before the death of the universe; qed");
-
-            let id = Self::multi_account_id(multi_account_index);
-
-            let deposit = T::MultiAccountDepositBase::get()
-                + T::MultiAccountDepositFactor::get() * (other_signatories.len() as u32 + 1).into();
-
-            T::Currency::reserve(&who, deposit)?;
-
-            MultiAccountIndex::put(multi_account_index);
-
-            <MultiAccounts<T>>::insert(&id, MultiAccountData {
-                threshold,
-                signatories,
-                deposit,
-                depositor: who.clone(),
-            });
-
-            Self::deposit_event(RawEvent::NewMultiAccount(who, id));
-
-            Ok(())
-        }
+        // #[weight = FunctionOf(
+        //     |args: (&u16, &Vec<T::AccountId>)| 10_000 * (args.1.len() as u64 + 1),
+        //     DispatchClass::Normal,
+        //     Pays::Yes
+        // )]
+        // fn create(origin,
+        //     threshold: u16,
+        //     other_signatories: Vec<T::AccountId>
+        // ) -> DispatchResult {
+        //     let who = ensure_signed(origin)?;
+        //     ensure!(threshold >= 1, Error::<T>::ZeroThreshold);
+        //     let max_sigs = T::MaxSignatories::get() as usize;
+        //     ensure!(threshold as usize <= other_signatories.len() + 1, Error::<T>::TooFewSignatories);
+        //     ensure!(other_signatories.len() < max_sigs, Error::<T>::TooManySignatories);
+        //     let signatories = Self::ensure_sorted_and_insert(other_signatories.clone(), who.clone())?;
+        //
+        //     let multi_account_index = MultiAccountIndex::get()
+        //         .checked_add(1)
+        //         .expect("multi account indices will never reach 2^64 before the death of the universe; qed");
+        //
+        //     let id = Self::multi_account_id(multi_account_index);
+        //
+        //     let deposit = T::MultiAccountDepositBase::get()
+        //         + T::MultiAccountDepositFactor::get() * (other_signatories.len() as u32 + 1).into();
+        //
+        //     T::Currency::reserve(&who, deposit)?;
+        //
+        //     MultiAccountIndex::put(multi_account_index);
+        //
+        //     <MultiAccounts<T>>::insert(&id, MultiAccountData {
+        //         threshold,
+        //         signatories,
+        //         deposit,
+        //         depositor: who.clone(),
+        //     });
+        //
+        //     Self::deposit_event(RawEvent::NewMultiAccount(who, id));
+        //
+        //     Ok(())
+        // }
 
         /// Update an existing multi account with a new threshold and new signatories.
         ///
@@ -692,6 +692,43 @@ impl<T: Trait> Module<T> {
     /// Check that signatories are sorted and unique.
     fn is_sorted_and_unique(signatories: &Vec<T::AccountId>) -> bool {
         signatories.windows(2).all(|w| w[0] < w[1])
+    }
+
+    /// Internal only function to keep tests running
+    pub fn create(origin: T::Origin,
+                  threshold: u16,
+                  other_signatories: Vec<T::AccountId>
+    ) -> DispatchResult {
+        let who = ensure_signed(origin)?;
+        ensure!(threshold >= 1, Error::<T>::ZeroThreshold);
+        let max_sigs = T::MaxSignatories::get() as usize;
+        ensure!(threshold as usize <= other_signatories.len() + 1, Error::<T>::TooFewSignatories);
+        ensure!(other_signatories.len() < max_sigs, Error::<T>::TooManySignatories);
+        let signatories = Self::ensure_sorted_and_insert(other_signatories.clone(), who.clone())?;
+
+        let multi_account_index = MultiAccountIndex::get()
+            .checked_add(1)
+            .expect("multi account indices will never reach 2^64 before the death of the universe; qed");
+
+        let id = Self::multi_account_id(multi_account_index);
+
+        let deposit = T::MultiAccountDepositBase::get()
+            + T::MultiAccountDepositFactor::get() * (other_signatories.len() as u32 + 1).into();
+
+        T::Currency::reserve(&who, deposit)?;
+
+        MultiAccountIndex::put(multi_account_index);
+
+        <MultiAccounts<T>>::insert(&id, MultiAccountData {
+            threshold,
+            signatories,
+            deposit,
+            depositor: who.clone(),
+        });
+
+        Self::deposit_event(RawEvent::NewMultiAccount(who, id));
+
+        Ok(())
     }
 
     /// Check that signatories is sorted and doesn't contain sender, then insert sender.
