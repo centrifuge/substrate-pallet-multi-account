@@ -23,6 +23,8 @@ branches:
   - master
 
 before_script:
+- rustup update 1.44.1
+- rustup default 1.44.1
 - rustup component add rustfmt
 
 script:
