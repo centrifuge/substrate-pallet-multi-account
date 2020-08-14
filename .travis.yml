@@ -25,6 +25,8 @@ branches:
 before_script:
 - rustup update 1.44.1
 - rustup default 1.44.1
+- rustup toolchain install 1.44.1
+- rustup target add wasm32-unknown-unknown --toolchain 1.44.1
 - rustup component add rustfmt
 
 script:
