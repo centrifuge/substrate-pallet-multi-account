@@ -181,7 +181,7 @@ decl_storage! {
         config(multi_accounts): Vec<(T::AccountId, u16, Vec<T::AccountId>)>;
         build(|config: &GenesisConfig<T>| {
             for &(ref depositor, threshold, ref other_signatories) in config.multi_accounts.iter() {
-                <Module<T>>::create(
+                <Module<T>>::create_int(
                     T::Origin::from(Some(depositor.clone()).into()),
                     threshold,
                     other_signatories.clone(),
@@ -193,6 +193,8 @@ decl_storage! {
 
 decl_error! {
     pub enum Error for Module<T: Trait> {
+        /// Pallet is deprecated
+        DeprecatedPallet,
         /// Threshold is too low (zero).
         ZeroThreshold,
         /// Call is already approved by this signatory.
@@ -269,6 +271,7 @@ decl_module! {
         /// Deposit one of this module's events by using the default implementation.
         fn deposit_event() = default;
 
+        /// DEPRECATED
         /// Create a new multi account with a threshold and given signatories.
         ///
         /// This generates a new static account id, that will persist when the threshold or set of signatories are
@@ -296,46 +299,20 @@ decl_module! {
         ///   deposit taken for its lifetime of
         ///   `MultiAccountDepositBase + other_signatories.len() * MultiAccountDepositFactor`.
         /// # </weight>
-        // #[weight = FunctionOf(
-        //     |args: (&u16, &Vec<T::AccountId>)| 10_000 * (args.1.len() as u64 + 1),
-        //     DispatchClass::Normal,
-        //     Pays::Yes
-        // )]
-        // fn create(origin,
-        //     threshold: u16,
-        //     other_signatories: Vec<T::AccountId>
-        // ) -> DispatchResult {
-        //     let who = ensure_signed(origin)?;
-        //     ensure!(threshold >= 1, Error::<T>::ZeroThreshold);
-        //     let max_sigs = T::MaxSignatories::get() as usize;
-        //     ensure!(threshold as usize <= other_signatories.len() + 1, Error::<T>::TooFewSignatories);
-        //     ensure!(other_signatories.len() < max_sigs, Error::<T>::TooManySignatories);
-        //     let signatories = Self::ensure_sorted_and_insert(other_signatories.clone(), who.clone())?;
-        //
-        //     let multi_account_index = MultiAccountIndex::get()
-        //         .checked_add(1)
-        //         .expect("multi account indices will never reach 2^64 before the death of the universe; qed");
-        //
-        //     let id = Self::multi_account_id(multi_account_index);
-        //
-        //     let deposit = T::MultiAccountDepositBase::get()
-        //         + T::MultiAccountDepositFactor::get() * (other_signatories.len() as u32 + 1).into();
-        //
-        //     T::Currency::reserve(&who, deposit)?;
-        //
-        //     MultiAccountIndex::put(multi_account_index);
-        //
-        //     <MultiAccounts<T>>::insert(&id, MultiAccountData {
-        //         threshold,
-        //         signatories,
-        //         deposit,
-        //         depositor: who.clone(),
-        //     });
-        //
-        //     Self::deposit_event(RawEvent::NewMultiAccount(who, id));
-        //
-        //     Ok(())
-        // }
+        #[weight = FunctionOf(
+            |args: (&u16, &Vec<T::AccountId>)| 10_000 * (args.1.len() as u64 + 1),
+            DispatchClass::Normal,
+            Pays::Yes
+        )]
+        fn create(
+            origin,
+            threshold: u16,
+            other_signatories: Vec<T::AccountId>,
+        ) -> DispatchResult {
+            ensure!(false, Error::<T>::DeprecatedPallet);
+
+            Ok(())
+        }
 
         /// Update an existing multi account with a new threshold and new signatories.
         ///
@@ -695,20 +672,27 @@ impl<T: Trait> Module<T> {
     }
 
     /// Internal only function to keep tests running
-    pub fn create(origin: T::Origin,
-                  threshold: u16,
-                  other_signatories: Vec<T::AccountId>
+    pub fn create_int(
+        origin: T::Origin,
+        threshold: u16,
+        other_signatories: Vec<T::AccountId>,
     ) -> DispatchResult {
         let who = ensure_signed(origin)?;
         ensure!(threshold >= 1, Error::<T>::ZeroThreshold);
         let max_sigs = T::MaxSignatories::get() as usize;
-        ensure!(threshold as usize <= other_signatories.len() + 1, Error::<T>::TooFewSignatories);
-        ensure!(other_signatories.len() < max_sigs, Error::<T>::TooManySignatories);
+        ensure!(
+            threshold as usize <= other_signatories.len() + 1,
+            Error::<T>::TooFewSignatories
+        );
+        ensure!(
+            other_signatories.len() < max_sigs,
+            Error::<T>::TooManySignatories
+        );
         let signatories = Self::ensure_sorted_and_insert(other_signatories.clone(), who.clone())?;
 
-        let multi_account_index = MultiAccountIndex::get()
-            .checked_add(1)
-            .expect("multi account indices will never reach 2^64 before the death of the universe; qed");
+        let multi_account_index = MultiAccountIndex::get().checked_add(1).expect(
+            "multi account indices will never reach 2^64 before the death of the universe; qed",
+        );
 
         let id = Self::multi_account_id(multi_account_index);
 
@@ -719,12 +703,15 @@ impl<T: Trait> Module<T> {
 
         MultiAccountIndex::put(multi_account_index);
 
-        <MultiAccounts<T>>::insert(&id, MultiAccountData {
-            threshold,
-            signatories,
-            deposit,
-            depositor: who.clone(),
-        });
+        <MultiAccounts<T>>::insert(
+            &id,
+            MultiAccountData {
+                threshold,
+                signatories,
+                deposit,
+                depositor: who.clone(),
+            },
+        );
 
         Self::deposit_event(RawEvent::NewMultiAccount(who, id));
 
@@ -919,7 +906,7 @@ mod tests {
             assert_ok!(Balances::transfer(Origin::signed(2), multi_id, 5));
             assert_ok!(Balances::transfer(Origin::signed(3), multi_id, 5));
 
-            assert_ok!(MultiAccount::create(Origin::signed(1), 2, vec![2, 3]));
+            assert_ok!(MultiAccount::create_int(Origin::signed(1), 2, vec![2, 3]));
             assert_eq!(Balances::free_balance(1), 11);
             assert_eq!(Balances::reserved_balance(1), 4);
             expect_event(RawEvent::NewMultiAccount(1, multi_id));
@@ -960,7 +947,7 @@ mod tests {
             assert_ok!(Balances::transfer(Origin::signed(2), multi_id, 5));
             assert_ok!(Balances::transfer(Origin::signed(3), multi_id, 5));
 
-            assert_ok!(MultiAccount::create(Origin::signed(1), 2, vec![2, 3]));
+            assert_ok!(MultiAccount::create_int(Origin::signed(1), 2, vec![2, 3]));
             assert_eq!(
                 <MultiAccounts<Test>>::get(&multi_id),
                 Some(MultiAccountData {
@@ -1010,7 +997,7 @@ mod tests {
             let multi_id = MultiAccount::multi_account_id(2);
             let call = Box::new(Call::Balances(BalancesCall::transfer(6, 15)));
             let hash = call.using_encoded(blake2_256);
-            assert_ok!(MultiAccount::create(Origin::signed(1), 3, vec![2, 3]));
+            assert_ok!(MultiAccount::create_int(Origin::signed(1), 3, vec![2, 3]));
             assert_ok!(MultiAccount::approve(
                 Origin::signed(1),
                 multi_id,
@@ -1046,7 +1033,7 @@ mod tests {
             assert_ok!(Balances::transfer(Origin::signed(2), multi_id, 5));
             assert_ok!(Balances::transfer(Origin::signed(3), multi_id, 5));
 
-            assert_ok!(MultiAccount::create(Origin::signed(1), 3, vec![2, 3]));
+            assert_ok!(MultiAccount::create_int(Origin::signed(1), 3, vec![2, 3]));
 
             let call = Box::new(Call::Balances(BalancesCall::transfer(6, 15)));
             let hash = call.using_encoded(blake2_256);
@@ -1099,7 +1086,7 @@ mod tests {
             assert_ok!(Balances::transfer(Origin::signed(2), multi_id, 5));
             assert_ok!(Balances::transfer(Origin::signed(3), multi_id, 5));
 
-            assert_ok!(MultiAccount::create(Origin::signed(1), 2, vec![2, 3]));
+            assert_ok!(MultiAccount::create_int(Origin::signed(1), 2, vec![2, 3]));
 
             let call = Box::new(Call::Balances(BalancesCall::transfer(6, 15)));
             let hash = call.using_encoded(blake2_256);
@@ -1130,7 +1117,7 @@ mod tests {
             assert_ok!(Balances::transfer(Origin::signed(2), multi_id, 5));
             assert_ok!(Balances::transfer(Origin::signed(3), multi_id, 5));
 
-            assert_ok!(MultiAccount::create(Origin::signed(1), 3, vec![2, 3]));
+            assert_ok!(MultiAccount::create_int(Origin::signed(1), 3, vec![2, 3]));
 
             let call = Box::new(Call::Balances(BalancesCall::transfer(6, 15)));
             let hash = call.using_encoded(blake2_256);
@@ -1163,7 +1150,7 @@ mod tests {
         new_test_ext().execute_with(|| {
             let multi_id = MultiAccount::multi_account_id(2);
 
-            assert_ok!(MultiAccount::create(Origin::signed(1), 3, vec![2, 3]));
+            assert_ok!(MultiAccount::create_int(Origin::signed(1), 3, vec![2, 3]));
 
             let call = Box::new(Call::Balances(BalancesCall::transfer(6, 15)));
             let hash = call.using_encoded(blake2_256);
@@ -1205,7 +1192,7 @@ mod tests {
             assert_ok!(Balances::transfer(Origin::signed(2), multi_id, 5));
             assert_ok!(Balances::transfer(Origin::signed(3), multi_id, 5));
 
-            assert_ok!(MultiAccount::create(Origin::signed(1), 2, vec![2, 3]));
+            assert_ok!(MultiAccount::create_int(Origin::signed(1), 2, vec![2, 3]));
 
             let call = Box::new(Call::Balances(BalancesCall::transfer(6, 15)));
             assert_ok!(MultiAccount::call(
@@ -1235,7 +1222,7 @@ mod tests {
             assert_ok!(Balances::transfer(Origin::signed(2), multi_id, 5));
             assert_ok!(Balances::transfer(Origin::signed(3), multi_id, 5));
 
-            assert_ok!(MultiAccount::create(Origin::signed(1), 2, vec![2, 3]));
+            assert_ok!(MultiAccount::create_int(Origin::signed(1), 2, vec![2, 3]));
 
             let call1 = Box::new(Call::Balances(BalancesCall::transfer(6, 10)));
             let call2 = Box::new(Call::Balances(BalancesCall::transfer(7, 5)));
@@ -1279,7 +1266,7 @@ mod tests {
             assert_ok!(Balances::transfer(Origin::signed(2), multi_id, 5));
             assert_ok!(Balances::transfer(Origin::signed(3), multi_id, 5));
 
-            assert_ok!(MultiAccount::create(Origin::signed(1), 2, vec![2, 3]));
+            assert_ok!(MultiAccount::create_int(Origin::signed(1), 2, vec![2, 3]));
 
             let call = Box::new(Call::Balances(BalancesCall::transfer(6, 10)));
             assert_ok!(MultiAccount::call(
@@ -1322,7 +1309,7 @@ mod tests {
 
             assert_ok!(Balances::transfer(Origin::signed(1), multi_id, 5));
 
-            assert_ok!(MultiAccount::create(Origin::signed(1), 1, vec![]));
+            assert_ok!(MultiAccount::create_int(Origin::signed(1), 1, vec![]));
             assert_eq!(
                 <MultiAccounts<Test>>::get(&multi_id),
                 Some(MultiAccountData {
@@ -1356,12 +1343,12 @@ mod tests {
     fn zero_threshold_fails() {
         new_test_ext().execute_with(|| {
             assert_noop!(
-                MultiAccount::create(Origin::signed(1), 0, vec![2]),
+                MultiAccount::create_int(Origin::signed(1), 0, vec![2]),
                 Error::<Test>::ZeroThreshold,
             );
 
             let multi_id = MultiAccount::multi_account_id(2);
-            assert_ok!(MultiAccount::create(Origin::signed(1), 1, vec![2]));
+            assert_ok!(MultiAccount::create_int(Origin::signed(1), 1, vec![2]));
             assert_ok!(Balances::transfer(Origin::signed(1), multi_id, 5));
             assert_noop!(
                 MultiAccount::update(Origin::signed(multi_id), 0, vec![2, 3]),
@@ -1374,12 +1361,12 @@ mod tests {
     fn too_many_signatories_fails() {
         new_test_ext().execute_with(|| {
             assert_noop!(
-                MultiAccount::create(Origin::signed(1), 2, vec![2, 3, 4]),
+                MultiAccount::create_int(Origin::signed(1), 2, vec![2, 3, 4]),
                 Error::<Test>::TooManySignatories,
             );
 
             let multi_id = MultiAccount::multi_account_id(2);
-            assert_ok!(MultiAccount::create(Origin::signed(1), 1, vec![2]));
+            assert_ok!(MultiAccount::create_int(Origin::signed(1), 1, vec![2]));
             assert_ok!(Balances::transfer(Origin::signed(1), multi_id, 5));
             assert_noop!(
                 MultiAccount::update(Origin::signed(multi_id), 1, vec![2, 3, 4, 5]),
@@ -1392,7 +1379,7 @@ mod tests {
     fn update_non_existing_fails() {
         new_test_ext().execute_with(|| {
             let multi_id = MultiAccount::multi_account_id(2);
-            assert_ok!(MultiAccount::create(Origin::signed(1), 2, vec![2, 3]));
+            assert_ok!(MultiAccount::create_int(Origin::signed(1), 2, vec![2, 3]));
             assert_ok!(Balances::transfer(Origin::signed(1), multi_id, 5));
             assert_noop!(
                 MultiAccount::update(Origin::signed(1), 1, vec![2, 3]),
@@ -1405,7 +1392,7 @@ mod tests {
     fn remove_non_existing_fails() {
         new_test_ext().execute_with(|| {
             let multi_id = MultiAccount::multi_account_id(2);
-            assert_ok!(MultiAccount::create(Origin::signed(1), 2, vec![2, 3]));
+            assert_ok!(MultiAccount::create_int(Origin::signed(1), 2, vec![2, 3]));
             assert_ok!(Balances::transfer(Origin::signed(1), multi_id, 5));
             assert_noop!(
                 MultiAccount::remove(Origin::signed(1)),
@@ -1418,7 +1405,7 @@ mod tests {
     fn duplicate_approvals_are_ignored() {
         new_test_ext().execute_with(|| {
             let multi_id = MultiAccount::multi_account_id(2);
-            assert_ok!(MultiAccount::create(Origin::signed(1), 2, vec![2, 3]));
+            assert_ok!(MultiAccount::create_int(Origin::signed(1), 2, vec![2, 3]));
 
             let call = Box::new(Call::Balances(BalancesCall::transfer(6, 15)));
             let hash = call.using_encoded(blake2_256);
@@ -1458,7 +1445,7 @@ mod tests {
             assert_ok!(Balances::transfer(Origin::signed(2), multi_id, 5));
             assert_ok!(Balances::transfer(Origin::signed(3), multi_id, 5));
 
-            assert_ok!(MultiAccount::create(Origin::signed(1), 1, vec![2, 3]));
+            assert_ok!(MultiAccount::create_int(Origin::signed(1), 1, vec![2, 3]));
 
             let call = Box::new(Call::Balances(BalancesCall::transfer(6, 15)));
             let hash = call.using_encoded(blake2_256);
@@ -1503,7 +1490,7 @@ mod tests {
             assert_ok!(Balances::transfer(Origin::signed(2), multi_id, 5));
             assert_ok!(Balances::transfer(Origin::signed(3), multi_id, 5));
 
-            assert_ok!(MultiAccount::create(Origin::signed(1), 1, vec![2, 3]));
+            assert_ok!(MultiAccount::create_int(Origin::signed(1), 1, vec![2, 3]));
 
             let call = Box::new(Call::Balances(BalancesCall::transfer(6, 15)));
             let hash = call.using_encoded(blake2_256);
@@ -1529,7 +1516,7 @@ mod tests {
             assert_ok!(Balances::transfer(Origin::signed(2), multi_id, 5));
             assert_ok!(Balances::transfer(Origin::signed(3), multi_id, 5));
 
-            assert_ok!(MultiAccount::create(Origin::signed(1), 2, vec![2, 3]));
+            assert_ok!(MultiAccount::create_int(Origin::signed(1), 2, vec![2, 3]));
             assert_eq!(
                 <MultiAccounts<Test>>::get(&multi_id),
                 Some(MultiAccountData {
@@ -1593,7 +1580,7 @@ mod tests {
             assert_ok!(Balances::transfer(Origin::signed(2), multi_id, 5));
             assert_ok!(Balances::transfer(Origin::signed(3), multi_id, 5));
 
-            assert_ok!(MultiAccount::create(Origin::signed(1), 1, vec![]));
+            assert_ok!(MultiAccount::create_int(Origin::signed(1), 1, vec![]));
             assert_eq!(
                 <MultiAccounts<Test>>::get(&multi_id),
                 Some(MultiAccountData {
@@ -1640,7 +1627,7 @@ mod tests {
             assert_ok!(Balances::transfer(Origin::signed(1), multi_id, 5));
             assert_ok!(Balances::transfer(Origin::signed(2), multi_id, 5));
 
-            assert_ok!(MultiAccount::create(Origin::signed(1), 2, vec![2]));
+            assert_ok!(MultiAccount::create_int(Origin::signed(1), 2, vec![2]));
             assert_eq!(
                 <MultiAccounts<Test>>::get(&multi_id),
                 Some(MultiAccountData {
@@ -1696,7 +1683,7 @@ mod tests {
             assert_ok!(Balances::transfer(Origin::signed(2), multi_id, 5));
             assert_ok!(Balances::transfer(Origin::signed(3), multi_id, 5));
 
-            assert_ok!(MultiAccount::create(Origin::signed(1), 2, vec![2, 3]));
+            assert_ok!(MultiAccount::create_int(Origin::signed(1), 2, vec![2, 3]));
             assert_eq!(
                 <MultiAccounts<Test>>::get(&multi_id),
                 Some(MultiAccountData {
@@ -1765,7 +1752,7 @@ mod tests {
             assert_ok!(Balances::transfer(Origin::signed(2), multi_id, 5));
             assert_ok!(Balances::transfer(Origin::signed(3), multi_id, 5));
 
-            assert_ok!(MultiAccount::create(Origin::signed(1), 2, vec![2, 3]));
+            assert_ok!(MultiAccount::create_int(Origin::signed(1), 2, vec![2, 3]));
             assert_eq!(
                 <MultiAccounts<Test>>::get(&multi_id),
                 Some(MultiAccountData {
