@@ -30,6 +30,7 @@ before_script:
 - rustup component add rustfmt
 
 script:
+- cargo --version
 - cargo build
 - cargo test
 - cargo fmt -- --check
