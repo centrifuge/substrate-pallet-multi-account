@@ -309,9 +309,7 @@ decl_module! {
             threshold: u16,
             other_signatories: Vec<T::AccountId>,
         ) -> DispatchResult {
-            ensure!(false, Error::<T>::DeprecatedPallet);
-
-            Ok(())
+            Err(Error::<T>:: DeprecatedPallet.into())
         }
 
         /// Update an existing multi account with a new threshold and new signatories.
