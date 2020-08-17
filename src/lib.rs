@@ -297,7 +297,7 @@ decl_module! {
         ///   `MultiAccountDepositBase + other_signatories.len() * MultiAccountDepositFactor`.
         /// # </weight>
         #[weight = FunctionOf(
-            |args: (&u16, &Vec<T::AccountId>)| 10_000 * (args.1.len() as u64 + 1),
+            |args: (&u16, &Vec<T::AccountId>)| 38_500_000 * (args.1.len() as u64 + 1),
             DispatchClass::Normal,
             Pays::Yes
         )]
@@ -368,7 +368,7 @@ decl_module! {
         ///   `MultiAccountDepositBase + signatories.len() * MultiAccountDepositFactor`.
         /// # </weight>
         #[weight = FunctionOf(
-            |args: (&u16, &Vec<T::AccountId>)| (10_000 * args.1.len() as u64 + 1),
+            |args: (&u16, &Vec<T::AccountId>)| 38_500_000 * (args.1.len() as u64 + 1),
             DispatchClass::Normal,
             Pays::Yes
         )]
@@ -430,7 +430,7 @@ decl_module! {
         /// - One event.
         /// - Storage: removes one item, value size bounded by `MaxSignatories`.
         /// # </weight>
-        #[weight = 1_000_000]
+        #[weight = 192_000_000]
         fn remove(origin) -> DispatchResult {
             let who = ensure_signed(origin)?;
             let multi_account = <MultiAccounts<T>>::get(&who).ok_or(Error::<T>::MultiAccountNotFound)?;
@@ -581,7 +581,7 @@ decl_module! {
         ///   deposit taken for its lifetime of
         ///   `MultisigDepositBase + threshold * MultisigDepositFactor`.
         /// # </weight>
-        #[weight = 1_000_000]
+        #[weight = 192_000_000]
         fn approve(origin,
             multi_account_id: T::AccountId,
             maybe_timepoint: Option<Timepoint<T::BlockNumber>>,
@@ -651,7 +651,7 @@ decl_module! {
         /// - I/O: 1 read `O(S)`, one remove.
         /// - Storage: removes one item.
         /// # </weight>
-        #[weight = 1_000_000]
+        #[weight = 192_000_000]
         fn cancel(origin,
             multi_account_id: T::AccountId,
             timepoint: Timepoint<T::BlockNumber>,
