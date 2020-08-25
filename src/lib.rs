@@ -77,7 +77,7 @@ use frame_support::{
 };
 use frame_support::{
     traits::{Currency, Get, ReservableCurrency},
-    weights::{DispatchClass, FunctionOf, GetDispatchInfo, Pays},
+    weights::{DispatchClass, GetDispatchInfo, Pays, Weight},
 };
 use frame_system::{self as system, ensure_signed};
 use sp_core::TypeId;
@@ -299,11 +299,7 @@ decl_module! {
         ///   deposit taken for its lifetime of
         ///   `MultiAccountDepositBase + other_signatories.len() * MultiAccountDepositFactor`.
         /// # </weight>
-        #[weight = FunctionOf(
-            |args: (&u16, &Vec<T::AccountId>)| 38_500_000 * (args.1.len() as u64 + 1),
-            DispatchClass::Normal,
-            Pays::Yes
-        )]
+        #[weight = ((38_500_000 * (other_signatories.len() as u64 + 1)) as Weight, DispatchClass::Normal, Pays::Yes)]
         fn create(
             origin,
             threshold: u16,
@@ -342,11 +338,7 @@ decl_module! {
         ///   deposit taken for its lifetime of
         ///   `MultiAccountDepositBase + signatories.len() * MultiAccountDepositFactor`.
         /// # </weight>
-        #[weight = FunctionOf(
-            |args: (&u16, &Vec<T::AccountId>)| 38_500_000 * (args.1.len() as u64 + 1),
-            DispatchClass::Normal,
-            Pays::Yes
-        )]
+        #[weight = ((38_500_000 * (signatories.len() as u64 + 1)) as Weight, DispatchClass::Normal, Pays::Yes)]
         fn update(origin,
             threshold: u16,
             signatories: Vec<T::AccountId>
@@ -462,11 +454,7 @@ decl_module! {
         ///   deposit taken for its lifetime of
         ///   `MultisigDepositBase + threshold * MultisigDepositFactor`.
         /// # </weight>
-        #[weight = FunctionOf(
-            |args: (&T::AccountId, &Option<Timepoint<T::BlockNumber>>, &Box<<T as Trait>::Call>)| args.2.get_dispatch_info().weight,
-            |args: (&T::AccountId, &Option<Timepoint<T::BlockNumber>>, &Box<<T as Trait>::Call>)| args.2.get_dispatch_info().class,
-            Pays::Yes
-        )]
+        #[weight = (call.get_dispatch_info().weight, call.get_dispatch_info().class, Pays::Yes)]
         fn call(origin,
             multi_account_id: T::AccountId,
             maybe_timepoint: Option<Timepoint<T::BlockNumber>>,
@@ -785,11 +773,12 @@ mod tests {
         pub const AvailableBlockRatio: Perbill = Perbill::one();
     }
     impl frame_system::Trait for Test {
+        type BaseCallFilter = ();
         type Origin = Origin;
+        type Call = Call;
         type Index = u64;
         type BlockNumber = u64;
         type Hash = H256;
-        type Call = Call;
         type Hashing = BlakeTwo256;
         type AccountId = u64;
         type Lookup = IdentityLookup<Self::AccountId>;
@@ -797,6 +786,10 @@ mod tests {
         type Event = TestEvent;
         type BlockHashCount = BlockHashCount;
         type MaximumBlockWeight = MaximumBlockWeight;
+        type DbWeight = ();
+        type BlockExecutionWeight = ();
+        type ExtrinsicBaseWeight = ();
+        type MaximumExtrinsicWeight = ();
         type MaximumBlockLength = MaximumBlockLength;
         type AvailableBlockRatio = AvailableBlockRatio;
         type Version = ();
@@ -804,20 +797,18 @@ mod tests {
         type AccountData = pallet_balances::AccountData<u64>;
         type OnNewAccount = ();
         type OnKilledAccount = ();
-        type DbWeight = ();
-        type BlockExecutionWeight = ();
-        type ExtrinsicBaseWeight = ();
-        type MaximumExtrinsicWeight = ();
+        type SystemWeightInfo = ();
     }
     parameter_types! {
         pub const ExistentialDeposit: u64 = 1;
     }
     impl pallet_balances::Trait for Test {
         type Balance = u64;
-        type Event = TestEvent;
         type DustRemoval = ();
+        type Event = TestEvent;
         type ExistentialDeposit = ExistentialDeposit;
         type AccountStore = System;
+        type WeightInfo = ();
     }
     parameter_types! {
         pub const MultiAccountDepositBase: u64 = 1;
