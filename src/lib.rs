@@ -77,7 +77,7 @@ use frame_support::{
 };
 use frame_support::{
     traits::{Currency, Get, ReservableCurrency},
-    weights::{DispatchClass, Weight, GetDispatchInfo, Pays},
+    weights::{DispatchClass, GetDispatchInfo, Pays, Weight},
 };
 use frame_system::{self as system, ensure_signed};
 use sp_core::TypeId;
