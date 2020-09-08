@@ -396,7 +396,7 @@ dependencies = [
 [[package]]
 name = "frame-benchmarking"
 version = "2.0.0-rc6"
-source = "git+https://github.com/paritytech/substrate.git?rev=be8bb186d87b9d2b47a2907c9b51ae1e252362c3#be8bb186d87b9d2b47a2907c9b51ae1e252362c3"
+source = "git+https://github.com/centrifuge/substrate.git?rev=cdc1f5007dedbb08bd065960261274f89695380c#cdc1f5007dedbb08bd065960261274f89695380c"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -414,7 +414,7 @@ dependencies = [
 [[package]]
 name = "frame-metadata"
 version = "11.0.0-rc6"
-source = "git+https://github.com/paritytech/substrate.git?rev=be8bb186d87b9d2b47a2907c9b51ae1e252362c3#be8bb186d87b9d2b47a2907c9b51ae1e252362c3"
+source = "git+https://github.com/centrifuge/substrate.git?rev=cdc1f5007dedbb08bd065960261274f89695380c#cdc1f5007dedbb08bd065960261274f89695380c"
 dependencies = [
  "parity-scale-codec",
  "serde",
@@ -425,7 +425,7 @@ dependencies = [
 [[package]]
 name = "frame-support"
 version = "2.0.0-rc6"
-source = "git+https://github.com/paritytech/substrate.git?rev=be8bb186d87b9d2b47a2907c9b51ae1e252362c3#be8bb186d87b9d2b47a2907c9b51ae1e252362c3"
+source = "git+https://github.com/centrifuge/substrate.git?rev=cdc1f5007dedbb08bd065960261274f89695380c#cdc1f5007dedbb08bd065960261274f89695380c"
 dependencies = [
  "bitmask",
  "frame-metadata",
@@ -450,7 +450,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural"
 version = "2.0.0-rc6"
-source = "git+https://github.com/paritytech/substrate.git?rev=be8bb186d87b9d2b47a2907c9b51ae1e252362c3#be8bb186d87b9d2b47a2907c9b51ae1e252362c3"
+source = "git+https://github.com/centrifuge/substrate.git?rev=cdc1f5007dedbb08bd065960261274f89695380c#cdc1f5007dedbb08bd065960261274f89695380c"
 dependencies = [
  "frame-support-procedural-tools",
  "proc-macro2",
@@ -461,7 +461,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural-tools"
 version = "2.0.0-rc6"
-source = "git+https://github.com/paritytech/substrate.git?rev=be8bb186d87b9d2b47a2907c9b51ae1e252362c3#be8bb186d87b9d2b47a2907c9b51ae1e252362c3"
+source = "git+https://github.com/centrifuge/substrate.git?rev=cdc1f5007dedbb08bd065960261274f89695380c#cdc1f5007dedbb08bd065960261274f89695380c"
 dependencies = [
  "frame-support-procedural-tools-derive",
  "proc-macro-crate",
@@ -473,7 +473,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural-tools-derive"
 version = "2.0.0-rc6"
-source = "git+https://github.com/paritytech/substrate.git?rev=be8bb186d87b9d2b47a2907c9b51ae1e252362c3#be8bb186d87b9d2b47a2907c9b51ae1e252362c3"
+source = "git+https://github.com/centrifuge/substrate.git?rev=cdc1f5007dedbb08bd065960261274f89695380c#cdc1f5007dedbb08bd065960261274f89695380c"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -483,7 +483,7 @@ dependencies = [
 [[package]]
 name = "frame-system"
 version = "2.0.0-rc6"
-source = "git+https://github.com/paritytech/substrate.git?rev=be8bb186d87b9d2b47a2907c9b51ae1e252362c3#be8bb186d87b9d2b47a2907c9b51ae1e252362c3"
+source = "git+https://github.com/centrifuge/substrate.git?rev=cdc1f5007dedbb08bd065960261274f89695380c#cdc1f5007dedbb08bd065960261274f89695380c"
 dependencies = [
  "frame-support",
  "impl-trait-for-tuples",
@@ -986,7 +986,7 @@ checksum = "624a8340c38c1b80fd549087862da4ba43e08858af025b236e509b6649fc13d5"
 [[package]]
 name = "pallet-balances"
 version = "2.0.0-rc6"
-source = "git+https://github.com/paritytech/substrate.git?rev=be8bb186d87b9d2b47a2907c9b51ae1e252362c3#be8bb186d87b9d2b47a2907c9b51ae1e252362c3"
+source = "git+https://github.com/centrifuge/substrate.git?rev=cdc1f5007dedbb08bd065960261274f89695380c#cdc1f5007dedbb08bd065960261274f89695380c"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -1563,7 +1563,7 @@ checksum = "fbee7696b84bbf3d89a1c2eccff0850e3047ed46bfcd2e92c29a2d074d57e252"
 [[package]]
 name = "sp-api"
 version = "2.0.0-rc6"
-source = "git+https://github.com/paritytech/substrate.git?rev=be8bb186d87b9d2b47a2907c9b51ae1e252362c3#be8bb186d87b9d2b47a2907c9b51ae1e252362c3"
+source = "git+https://github.com/centrifuge/substrate.git?rev=cdc1f5007dedbb08bd065960261274f89695380c#cdc1f5007dedbb08bd065960261274f89695380c"
 dependencies = [
  "hash-db",
  "parity-scale-codec",
@@ -1578,7 +1578,7 @@ dependencies = [
 [[package]]
 name = "sp-api-proc-macro"
 version = "2.0.0-rc6"
-source = "git+https://github.com/paritytech/substrate.git?rev=be8bb186d87b9d2b47a2907c9b51ae1e252362c3#be8bb186d87b9d2b47a2907c9b51ae1e252362c3"
+source = "git+https://github.com/centrifuge/substrate.git?rev=cdc1f5007dedbb08bd065960261274f89695380c#cdc1f5007dedbb08bd065960261274f89695380c"
 dependencies = [
  "blake2-rfc",
  "proc-macro-crate",
@@ -1590,7 +1590,7 @@ dependencies = [
 [[package]]
 name = "sp-application-crypto"
 version = "2.0.0-rc6"
-source = "git+https://github.com/paritytech/substrate.git?rev=be8bb186d87b9d2b47a2907c9b51ae1e252362c3#be8bb186d87b9d2b47a2907c9b51ae1e252362c3"
+source = "git+https://github.com/centrifuge/substrate.git?rev=cdc1f5007dedbb08bd065960261274f89695380c#cdc1f5007dedbb08bd065960261274f89695380c"
 dependencies = [
  "parity-scale-codec",
  "serde",
@@ -1602,7 +1602,7 @@ dependencies = [
 [[package]]
 name = "sp-arithmetic"
 version = "2.0.0-rc6"
-source = "git+https://github.com/paritytech/substrate.git?rev=be8bb186d87b9d2b47a2907c9b51ae1e252362c3#be8bb186d87b9d2b47a2907c9b51ae1e252362c3"
+source = "git+https://github.com/centrifuge/substrate.git?rev=cdc1f5007dedbb08bd065960261274f89695380c#cdc1f5007dedbb08bd065960261274f89695380c"
 dependencies = [
  "integer-sqrt",
  "num-traits",
@@ -1615,7 +1615,7 @@ dependencies = [
 [[package]]
 name = "sp-core"
 version = "2.0.0-rc6"
-source = "git+https://github.com/paritytech/substrate.git?rev=be8bb186d87b9d2b47a2907c9b51ae1e252362c3#be8bb186d87b9d2b47a2907c9b51ae1e252362c3"
+source = "git+https://github.com/centrifuge/substrate.git?rev=cdc1f5007dedbb08bd065960261274f89695380c#cdc1f5007dedbb08bd065960261274f89695380c"
 dependencies = [
  "base58",
  "blake2-rfc",
@@ -1659,7 +1659,7 @@ dependencies = [
 [[package]]
 name = "sp-debug-derive"
 version = "2.0.0-rc6"
-source = "git+https://github.com/paritytech/substrate.git?rev=be8bb186d87b9d2b47a2907c9b51ae1e252362c3#be8bb186d87b9d2b47a2907c9b51ae1e252362c3"
+source = "git+https://github.com/centrifuge/substrate.git?rev=cdc1f5007dedbb08bd065960261274f89695380c#cdc1f5007dedbb08bd065960261274f89695380c"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1669,7 +1669,7 @@ dependencies = [
 [[package]]
 name = "sp-externalities"
 version = "0.8.0-rc6"
-source = "git+https://github.com/paritytech/substrate.git?rev=be8bb186d87b9d2b47a2907c9b51ae1e252362c3#be8bb186d87b9d2b47a2907c9b51ae1e252362c3"
+source = "git+https://github.com/centrifuge/substrate.git?rev=cdc1f5007dedbb08bd065960261274f89695380c#cdc1f5007dedbb08bd065960261274f89695380c"
 dependencies = [
  "environmental",
  "parity-scale-codec",
@@ -1680,7 +1680,7 @@ dependencies = [
 [[package]]
 name = "sp-inherents"
 version = "2.0.0-rc6"
-source = "git+https://github.com/paritytech/substrate.git?rev=be8bb186d87b9d2b47a2907c9b51ae1e252362c3#be8bb186d87b9d2b47a2907c9b51ae1e252362c3"
+source = "git+https://github.com/centrifuge/substrate.git?rev=cdc1f5007dedbb08bd065960261274f89695380c#cdc1f5007dedbb08bd065960261274f89695380c"
 dependencies = [
  "derive_more",
  "parity-scale-codec",
@@ -1692,7 +1692,7 @@ dependencies = [
 [[package]]
 name = "sp-io"
 version = "2.0.0-rc6"
-source = "git+https://github.com/paritytech/substrate.git?rev=be8bb186d87b9d2b47a2907c9b51ae1e252362c3#be8bb186d87b9d2b47a2907c9b51ae1e252362c3"
+source = "git+https://github.com/centrifuge/substrate.git?rev=cdc1f5007dedbb08bd065960261274f89695380c#cdc1f5007dedbb08bd065960261274f89695380c"
 dependencies = [
  "futures",
  "hash-db",
@@ -1713,7 +1713,7 @@ dependencies = [
 [[package]]
 name = "sp-panic-handler"
 version = "2.0.0-rc6"
-source = "git+https://github.com/paritytech/substrate.git?rev=be8bb186d87b9d2b47a2907c9b51ae1e252362c3#be8bb186d87b9d2b47a2907c9b51ae1e252362c3"
+source = "git+https://github.com/centrifuge/substrate.git?rev=cdc1f5007dedbb08bd065960261274f89695380c#cdc1f5007dedbb08bd065960261274f89695380c"
 dependencies = [
  "backtrace",
  "log",
@@ -1722,7 +1722,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime"
 version = "2.0.0-rc6"
-source = "git+https://github.com/paritytech/substrate.git?rev=be8bb186d87b9d2b47a2907c9b51ae1e252362c3#be8bb186d87b9d2b47a2907c9b51ae1e252362c3"
+source = "git+https://github.com/centrifuge/substrate.git?rev=cdc1f5007dedbb08bd065960261274f89695380c#cdc1f5007dedbb08bd065960261274f89695380c"
 dependencies = [
  "either",
  "hash256-std-hasher",
@@ -1744,7 +1744,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface"
 version = "2.0.0-rc6"
-source = "git+https://github.com/paritytech/substrate.git?rev=be8bb186d87b9d2b47a2907c9b51ae1e252362c3#be8bb186d87b9d2b47a2907c9b51ae1e252362c3"
+source = "git+https://github.com/centrifuge/substrate.git?rev=cdc1f5007dedbb08bd065960261274f89695380c#cdc1f5007dedbb08bd065960261274f89695380c"
 dependencies = [
  "parity-scale-codec",
  "primitive-types",
@@ -1760,7 +1760,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface-proc-macro"
 version = "2.0.0-rc6"
-source = "git+https://github.com/paritytech/substrate.git?rev=be8bb186d87b9d2b47a2907c9b51ae1e252362c3#be8bb186d87b9d2b47a2907c9b51ae1e252362c3"
+source = "git+https://github.com/centrifuge/substrate.git?rev=cdc1f5007dedbb08bd065960261274f89695380c#cdc1f5007dedbb08bd065960261274f89695380c"
 dependencies = [
  "Inflector",
  "proc-macro-crate",
@@ -1772,7 +1772,7 @@ dependencies = [
 [[package]]
 name = "sp-state-machine"
 version = "0.8.0-rc6"
-source = "git+https://github.com/paritytech/substrate.git?rev=be8bb186d87b9d2b47a2907c9b51ae1e252362c3#be8bb186d87b9d2b47a2907c9b51ae1e252362c3"
+source = "git+https://github.com/centrifuge/substrate.git?rev=cdc1f5007dedbb08bd065960261274f89695380c#cdc1f5007dedbb08bd065960261274f89695380c"
 dependencies = [
  "hash-db",
  "itertools",
@@ -1793,12 +1793,12 @@ dependencies = [
 [[package]]
 name = "sp-std"
 version = "2.0.0-rc6"
-source = "git+https://github.com/paritytech/substrate.git?rev=be8bb186d87b9d2b47a2907c9b51ae1e252362c3#be8bb186d87b9d2b47a2907c9b51ae1e252362c3"
+source = "git+https://github.com/centrifuge/substrate.git?rev=cdc1f5007dedbb08bd065960261274f89695380c#cdc1f5007dedbb08bd065960261274f89695380c"
 
 [[package]]
 name = "sp-storage"
 version = "2.0.0-rc6"
-source = "git+https://github.com/paritytech/substrate.git?rev=be8bb186d87b9d2b47a2907c9b51ae1e252362c3#be8bb186d87b9d2b47a2907c9b51ae1e252362c3"
+source = "git+https://github.com/centrifuge/substrate.git?rev=cdc1f5007dedbb08bd065960261274f89695380c#cdc1f5007dedbb08bd065960261274f89695380c"
 dependencies = [
  "impl-serde 0.2.3",
  "parity-scale-codec",
@@ -1811,7 +1811,7 @@ dependencies = [
 [[package]]
 name = "sp-tracing"
 version = "2.0.0-rc6"
-source = "git+https://github.com/paritytech/substrate.git?rev=be8bb186d87b9d2b47a2907c9b51ae1e252362c3#be8bb186d87b9d2b47a2907c9b51ae1e252362c3"
+source = "git+https://github.com/centrifuge/substrate.git?rev=cdc1f5007dedbb08bd065960261274f89695380c#cdc1f5007dedbb08bd065960261274f89695380c"
 dependencies = [
  "log",
  "rental",
@@ -1821,7 +1821,7 @@ dependencies = [
 [[package]]
 name = "sp-trie"
 version = "2.0.0-rc6"
-source = "git+https://github.com/paritytech/substrate.git?rev=be8bb186d87b9d2b47a2907c9b51ae1e252362c3#be8bb186d87b9d2b47a2907c9b51ae1e252362c3"
+source = "git+https://github.com/centrifuge/substrate.git?rev=cdc1f5007dedbb08bd065960261274f89695380c#cdc1f5007dedbb08bd065960261274f89695380c"
 dependencies = [
  "hash-db",
  "memory-db",
@@ -1835,7 +1835,7 @@ dependencies = [
 [[package]]
 name = "sp-version"
 version = "2.0.0-rc6"
-source = "git+https://github.com/paritytech/substrate.git?rev=be8bb186d87b9d2b47a2907c9b51ae1e252362c3#be8bb186d87b9d2b47a2907c9b51ae1e252362c3"
+source = "git+https://github.com/centrifuge/substrate.git?rev=cdc1f5007dedbb08bd065960261274f89695380c#cdc1f5007dedbb08bd065960261274f89695380c"
 dependencies = [
  "impl-serde 0.2.3",
  "parity-scale-codec",
@@ -1847,7 +1847,7 @@ dependencies = [
 [[package]]
 name = "sp-wasm-interface"
 version = "2.0.0-rc6"
-source = "git+https://github.com/paritytech/substrate.git?rev=be8bb186d87b9d2b47a2907c9b51ae1e252362c3#be8bb186d87b9d2b47a2907c9b51ae1e252362c3"
+source = "git+https://github.com/centrifuge/substrate.git?rev=cdc1f5007dedbb08bd065960261274f89695380c#cdc1f5007dedbb08bd065960261274f89695380c"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
