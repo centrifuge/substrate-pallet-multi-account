@@ -11,16 +11,16 @@ repository = "https://github.com/centrifuge/substrate-pallet-multi-account/"
 [dependencies]
 serde = { version = "1.0.102", optional = true }
 codec = { package = "parity-scale-codec", version = "1.3.4", default-features = false }
-frame-support = { version = "2.0.0-rc6", default-features = false, git = "https://github.com/centrifuge/substrate.git", rev = "cdc1f5007dedbb08bd065960261274f89695380c" }
-frame-system = { version = "2.0.0-rc6", default-features = false, git = "https://github.com/centrifuge/substrate.git", rev = "cdc1f5007dedbb08bd065960261274f89695380c" }
-sp-core = { version = "2.0.0-rc6", default-features = false, git = "https://github.com/centrifuge/substrate.git", rev = "cdc1f5007dedbb08bd065960261274f89695380c" }
-sp-runtime = { version = "2.0.0-rc6", default-features = false, git = "https://github.com/centrifuge/substrate.git", rev = "cdc1f5007dedbb08bd065960261274f89695380c" }
-sp-std = { version = "2.0.0-rc6", default-features = false, git = "https://github.com/centrifuge/substrate.git", rev = "cdc1f5007dedbb08bd065960261274f89695380c" }
-sp-io = { version = "2.0.0-rc6", default-features = false, git = "https://github.com/centrifuge/substrate.git", rev = "cdc1f5007dedbb08bd065960261274f89695380c" }
+frame-support = { version = "2.0.0-rc6", default-features = false, git = "https://github.com/centrifuge/substrate.git", rev = "ca1e934664875de0486f70e63ef7ef81e13e85ea" }
+frame-system = { version = "2.0.0-rc6", default-features = false, git = "https://github.com/centrifuge/substrate.git", rev = "ca1e934664875de0486f70e63ef7ef81e13e85ea" }
+sp-core = { version = "2.0.0-rc6", default-features = false, git = "https://github.com/centrifuge/substrate.git", rev = "ca1e934664875de0486f70e63ef7ef81e13e85ea" }
+sp-runtime = { version = "2.0.0-rc6", default-features = false, git = "https://github.com/centrifuge/substrate.git", rev = "ca1e934664875de0486f70e63ef7ef81e13e85ea" }
+sp-std = { version = "2.0.0-rc6", default-features = false, git = "https://github.com/centrifuge/substrate.git", rev = "ca1e934664875de0486f70e63ef7ef81e13e85ea" }
+sp-io = { version = "2.0.0-rc6", default-features = false, git = "https://github.com/centrifuge/substrate.git", rev = "ca1e934664875de0486f70e63ef7ef81e13e85ea" }
 
 [dev-dependencies]
-sp-core = { version = "2.0.0-rc6", git = "https://github.com/centrifuge/substrate.git", rev = "cdc1f5007dedbb08bd065960261274f89695380c" }
-pallet-balances = { version = "2.0.0-rc6", git = "https://github.com/centrifuge/substrate.git", rev = "cdc1f5007dedbb08bd065960261274f89695380c" }
+sp-core = { version = "2.0.0-rc6", git = "https://github.com/centrifuge/substrate.git", rev = "ca1e934664875de0486f70e63ef7ef81e13e85ea" }
+pallet-balances = { version = "2.0.0-rc6", git = "https://github.com/centrifuge/substrate.git", rev = "ca1e934664875de0486f70e63ef7ef81e13e85ea" }
 
 [features]
 default = ["std"]
